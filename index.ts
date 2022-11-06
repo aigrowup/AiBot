@@ -100,10 +100,27 @@ async function initDay() {
       (await bot.Contact.find({ name: config.NICKNAME })) ||
       (await bot.Contact.find({ alias: config.NAME })); // 获取你要发送的联系人
 	  
-	 
-	let  myRoom = await bot.Room.find({ topic: '成长荟广州' });
+	 const roomList = await bot.Room.findAll()
+	//let  myRoom = await bot.Room.find({ topic: "成长荟广州"});
+	let myRoom = null;
+	  let thisRoom  =null;
 	
-    let one = await superagent.getOne(); //获取每日一句
+	for (let i = 0; i < roomList.length; i++) {
+	   thisRoom = roomList[i];
+	  //console.log('群  %s %s',thisRoom.toString(),thisRoom.topic());
+	   
+	    
+		   let pos =(thisRoom.toString()).indexOf("成长荟广州站");
+		    console.log('包含字符? %d',pos);
+	        if( pos >1){
+			    console.log('群 %s',thisRoom.topic());
+	           myRoom = thisRoom;
+			   break;
+	        }    
+		
+	}
+	
+   // let one = await superagent.getOne(); //获取每日一句
     let weather = await superagent.getTXweather(); //获取天气信息
     let today = await untils.formatDate(new Date()); //获取今天的日期
     let memorialDay = untils.getDay(config.MEMORIAL_DAY); //获取纪念日天数
@@ -114,15 +131,16 @@ async function initDay() {
       weather.weatherTips
     }<br>${
       weather.todayWeather
-    }<br>每日一句:<br>${one}<br>`;
+    }`;
+	//<br>每日一句:<br>${one}<br>
 	
 	//<br>每日土味情话：<br>${sweetWord}<br><br>————————最爱你的我 -忽略
 	
 	
     try {
       logMsg = str;
-      //await delay(1000);
-     // await contact.say(str); // 发送消息
+      await delay(1000);
+      await contact.say(str); // 发送消息
 	  await delay(1000);
 	  await myRoom.say(str); // 发送消息
 	  
